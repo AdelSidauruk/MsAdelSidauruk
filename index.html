@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif PtLSV - Matematika SMP</title>
+    <!-- Menggunakan Tailwind CSS CDN untuk tata letak yang rapi dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Menggunakan Font Inter agar jelas dan mudah dibaca di layar HP -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Pengaturan dasar font dan mencegah scroll horizontal */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Animasi transisi halus antar layar dan elemen */
+        .fade-in {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Efek tekan pada tombol pilihan jawaban */
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        /* Styling khusus untuk teks matematika agar rapi */
+        .math-expr {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start sm:justify-center p-3 sm:p-6">
+
+    <!-- Kontainer Utama Aplikasi (Maksimal lebar seukuran layar HP besar/tablet kecil agar fokus) -->
+    <main class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden flex flex-col min-h-[88vh] sm:min-h-0">
+
+        <!-- ==========================================
+             HALAMAN 1: LAYAR PEMBUKA (BERANDA KUIS)
+             ========================================== -->
+        <section id="start-screen" class="p-6 sm:p-8 flex flex-col justify-between flex-grow fade-in">
+            <div>
+                <!-- Lencana Kelas -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold tracking-wide uppercase mb-4">
+                    <span>📐 Matematika SMP Kelas VII</span>
+                </div>
+
+                <!-- Judul Utama -->
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight mb-3">
+                    Kuis Pertidaksamaan Linear Satu Variabel
+                </h1>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+                    Uji pemahamanmu tentang konsep dasar, sifat perkalian bilangan negatif, hingga soal cerita PtLSV dengan pembahasan lengkap di setiap soal!
+                </p>
+
+                <!-- Kartu Informasi Kuis -->
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/70 space-y-3 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg shrink-0">
+                            10
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">10 Soal Bertingkat</h3>
+                            <p class="text-xs text-slate-500">Mulai dari konsep mudah hingga soal cerita.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg shrink-0">
+                            💡
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Pembahasan Langsung</h3>
+                            <p class="text-xs text-slate-500">Langkah penyelesaian muncul setelah menjawab.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg shrink-0">
+                            ⏱️
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Penghitung Waktu Belajar</h3>
+                            <p class="text-xs text-slate-500">Tanpa batas waktu ketat, fokus pada ketelitian.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opsi Pengacakan Soal -->
+                <label class="flex items-center justify-between p-3.5 rounded-2xl border border-slate-200 bg-white cursor-pointer hover:bg-slate-50 transition mb-6">
+                    <div class="pr-3">
+                        <span class="block text-sm font-semibold text-slate-800">Acak Urutan Soal</span>
+                        <span class="block text-xs text-slate-500">Cocok untuk latihan mengulang kuis</span>
+                    </div>
+                    <input type="checkbox" id="shuffle-toggle" class="w-5 h-5 accent-indigo-600 rounded cursor-pointer">
+                </label>
+            </div>
+
+            <!-- Tombol Mulai Kuis -->
+            <button id="start-btn" class="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-base rounded-2xl shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-2">
+                <span>Mulai Kuis Sekarang</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </section>
+
+        <!-- ==========================================
+             HALAMAN 2: LAYAR PENGERJAAN KUIS
+             ========================================== -->
+        <section id="quiz-screen" class="hidden flex-col flex-grow justify-between">
+            <!-- Header Navigasi, Progres, dan Timer -->
+            <div class="bg-slate-50 px-5 pt-5 pb-4 border-b border-slate-200/80">
+                <div class="flex items-center justify-between mb-3">
+                    <span id="question-counter" class="text-sm font-bold text-indigo-700 bg-indigo-100/80 px-3 py-1 rounded-full">
+                        Soal 1 dari 10
+                    </span>
+                    <div class="flex items-center gap-1.5 text-slate-600 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+                        <span class="text-xs">⏱️</span>
+                        <span id="timer-display" class="text-xs font-bold tabular-nums">00:00</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar Visual -->
+                <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 10%;"></div>
+                </div>
+            </div>
+
+            <!-- Area Konten Soal & Pilihan Jawaban -->
+            <div class="p-5 sm:p-6 flex-grow overflow-y-auto space-y-5">
+                <!-- Label Tingkat Kesulitan -->
+                <div>
+                    <span id="difficulty-badge" class="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 mb-2">
+                        Level: Dasar
+                    </span>
+                    <!-- Teks Pertanyaan -->
+                    <h2 id="question-text" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed">
+                        Memuat pertanyaan...
+                    </h2>
+                </div>
+
+                <!-- Daftar Tombol Pilihan A, B, C, D -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Pilihan jawaban akan dirender secara dinamis melalui JavaScript -->
+                </div>
+
+                <!-- Kotak Umpan Balik & Pembahasan Instan (Muncul setelah tombol Cek Jawaban diklik) -->
+                <div id="feedback-box" class="hidden rounded-2xl p-4 border fade-in">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="feedback-icon" class="text-xl"></span>
+                        <h3 id="feedback-title" class="font-extrabold text-base"></h3>
+                    </div>
+                    <div class="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-1.5 bg-white/80 p-3 rounded-xl border border-slate-200/60">
+                        <p class="font-bold text-slate-900">Langkah Penyelesaian:</p>
+                        <div id="explanation-text" class="space-y-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Tombol Aksi (Cek Jawaban / Lanjut) -->
+            <div class="p-4 sm:p-5 bg-white border-t border-slate-100">
+                <button id="check-btn" disabled class="w-full py-3.5 px-5 bg-slate-300 text-slate-500 font-bold text-base rounded-2xl transition cursor-not-allowed">
+                    Pilih Jawaban Terlebih Dahulu
+                </button>
+
+                <button id="next-btn" class="hidden w-full py-3.5 px-5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-base rounded-2xl shadow-md shadow-indigo-200 transition flex items-center justify-center gap-2">
+                    <span id="next-btn-text">Soal Berikutnya</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             HALAMAN 3: LAYAR REKAP SKOR & REVIEW
+             ========================================== -->
+        <section id="result-screen" class="hidden flex-col flex-grow justify-between p-5 sm:p-7 fade-in">
+            <div class="space-y-5">
+                <!-- Header Hasil -->
+                <div class="text-center">
+                    <span class="inline-block px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-wider mb-2">
+                        Hasil Evaluasi Belajar
+                    </span>
+                    <h2 class="text-2xl font-extrabold text-slate-900">Kuis Selesai!</h2>
+                </div>
+
+                <!-- Kartu Skor Utama -->
+                <div class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-3xl p-6 text-white text-center shadow-lg shadow-indigo-200">
+                    <p class="text-indigo-100 text-xs font-semibold uppercase tracking-wider mb-1">Skor Akhir Kamu</p>
+                    <div id="final-score" class="text-5xl sm:text-6xl font-black tracking-tight mb-2">
+                        0
+                    </div>
+                    <p id="motivation-text" class="text-sm font-medium text-indigo-50 leading-snug">
+                        Tetap semangat berlatih!
+                    </p>
+                </div>
+
+                <!-- Statistik Benar, Salah, dan Waktu -->
+                <div class="grid grid-cols-3 gap-2.5 text-center">
+                    <div class="bg-emerald-50 border border-emerald-200/80 rounded-2xl p-3">
+                        <span class="block text-xs font-semibold text-emerald-700">Benar</span>
+                        <span id="total-correct" class="text-xl font-extrabold text-emerald-600">0</span>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-200/80 rounded-2xl p-3">
+                        <span class="block text-xs font-semibold text-rose-700">Salah</span>
+                        <span id="total-wrong" class="text-xl font-extrabold text-rose-600">0</span>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3">
+                        <span class="block text-xs font-semibold text-slate-600">Waktu</span>
+                        <span id="total-time" class="text-lg font-extrabold text-slate-800 mt-0.5 block">00:00</span>
+                    </div>
+                </div>
+
+                <!-- Ringkasan Review Setiap Soal -->
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 mb-2.5 flex items-center justify-between">
+                        <span>Ringkasan Jawaban Kamu</span>
+                        <span class="text-xs font-normal text-slate-500">Gulir untuk melihat</span>
+                    </h3>
+                    <div id="review-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+                        <!-- Daftar review soal akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Ulangi Kuis -->
+            <div class="pt-5 mt-4 border-t border-slate-100 space-y-2.5">
+                <button id="restart-shuffle-btn" class="w-full py-3.5 px-5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-sm sm:text-base rounded-2xl shadow-md shadow-indigo-200 transition flex items-center justify-center gap-2">
+                    <span>🔀 Ulangi Kuis (Acak Soal)</span>
+                </button>
+                <button id="restart-normal-btn" class="w-full py-3 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-2xl transition">
+                    🔄 Ulangi Urutan Semula
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         LOGIKA JAVASCRIPT (DATA SOAL & INTERAKSI)
+         ========================================== -->
+    <script>
+        /**
+         * Bank Soal Pertidaksamaan Linear Satu Variabel (PtLSV)
+         * Disusun bertingkat dari mudah (nomor 1) hingga menantang (nomor 10).
+         */
+        const bankSoalPtLSV = [
+            {
+                id: 1,
+                level: "Level 1 • Konsep Dasar",
+                pertanyaan: "Manakah di bawah ini yang merupakan bentuk Pertidaksamaan Linear Satu Variabel (PtLSV)?",
+                pilihan: [
+                    "2x + 5 = 11",
+                    "3x - 4 > 8",
+                    "x + 2y ≤ 10",
+                    "x² - 9 < 0"
+                ],
+                jawabanBenar: 1, // Indeks 1 -> "3x - 4 > 8"
+                pembahasan: [
+                    "• PtLSV memiliki ciri: menggunakan tanda ketidaksamaan (<, >, ≤, ≥), memiliki 1 jenis variabel, dan pangkat tertinggi variabelnya adalah 1.",
+                    "• <b>2x + 5 = 11</b> adalah persamaan (memakai tanda '=').",
+                    "• <b>x + 2y ≤ 10</b> memiliki dua variabel (x dan y).",
+                    "• <b>x² - 9 < 0</b> adalah pertidaksamaan kuadrat (pangkat 2).",
+                    "• Jadi, jawaban yang tepat adalah <b>3x - 4 > 8</b>."
+                ]
+            },
+            {
+                id: 2,
+                level: "Level 2 • Simbol Pertidaksamaan",
+                pertanyaan: "Kalimat matematika yang tepat untuk pernyataan: <i>\"Tinggi badan minimal untuk mendaftar anggota paskibra adalah 165 cm\"</i> (dengan t = tinggi badan) adalah...",
+                pilihan: [
+                    "t < 165",
+                    "t > 165",
+                    "t ≤ 165",
+                    "t ≥ 165"
+                ],
+                jawabanBenar: 3, // Indeks 3 -> "t ≥ 165"
+                pembahasan: [
+                    "• Kata kunci <b>\"minimal\"</b> artinya paling sedikit atau tidak boleh kurang dari 165 cm.",
+                    "• Artinya tinggi badan boleh tepat 165 cm atau lebih dari 165 cm.",
+                    "• Simbol yang sesuai adalah lebih dari atau sama dengan (<b>≥</b>), sehingga ditulis <b>t ≥ 165</b>."
+                ]
+            },
+            {
+                id: 3,
+                level: "Level 3 • Aljabar Sederhana",
+                pertanyaan: "Tentukan himpunan penyelesaian dari pertidaksamaan <span class='math-expr'>x + 7 < 12</span> untuk <span class='math-expr'>x</span> bilangan asli!",
+                pilihan: [
+                    "{1, 2, 3, 4}",
+                    "{1, 2, 3, 4, 5}",
+                    "{5, 6, 7, ...}",
+                    "{0, 1, 2, 3, 4}"
+                ],
+                jawabanBenar: 0, // Indeks 0 -> "{1, 2, 3, 4}"
+                pembahasan: [
+                    "• Kurangi kedua ruas dengan 7: <br>x + 7 - 7 < 12 - 7",
+                    "• Diperoleh: <b>x < 5</b>",
+                    "• Ingat, bilangan asli dimulai dari angka 1 (1, 2, 3, ...).",
+                    "• Bilangan asli yang kurang dari 5 adalah <b>{1, 2, 3, 4}</b>."
+                ]
+            },
+            {
+                id: 4,
+                level: "Level 4 • Operasi Dua Langkah",
+                pertanyaan: "Penyelesaian dari pertidaksamaan <span class='math-expr'>3x - 5 ≥ 10</span> adalah...",
+                pilihan: [
+                    "x ≥ 3",
+                    "x ≤ 5",
+                    "x ≥ 5",
+                    "x > 5"
+                ],
+                jawabanBenar: 2, // Indeks 2 -> "x ≥ 5"
+                pembahasan: [
+                    "• Tambahkan kedua ruas dengan 5: <br>3x - 5 + 5 ≥ 10 + 5",
+                    "• 3x ≥ 15",
+                    "• Bagi kedua ruas dengan 3: <br>x ≥ 15 / 3",
+                    "• Jadi, penyelesaiannya adalah <b>x ≥ 5</b>."
+                ]
+            },
+            {
+                id: 5,
+                level: "Level 5 • Variabel di Kedua Ruas",
+                pertanyaan: "Nilai <span class='math-expr'>x</span> yang memenuhi pertidaksamaan <span class='math-expr'>5x - 2 < 2x + 10</span> adalah...",
+                pilihan: [
+                    "x < 2",
+                    "x < 4",
+                    "x > 4",
+                    "x < 6"
+                ],
+                jawabanBenar: 1, // Indeks 1 -> "x < 4"
+                pembahasan: [
+                    "• Kumpulkan suku bervariabel di ruas kiri dan konstanta di ruas kanan:",
+                    "• 5x - 2x < 10 + 2",
+                    "• 3x < 12",
+                    "• Bagi kedua ruas dengan 3: x < 12 / 3 → <b>x < 4</b>."
+                ]
+            },
+            {
+                id: 6,
+                level: "Level 6 • Pembagian Bilangan Negatif",
+                pertanyaan: "Himpunan penyelesaian dari <span class='math-expr'>-4x > 20</span> adalah...",
+                pilihan: [
+                    "x > -5",
+                    "x < 5",
+                    "x > 5",
+                    "x < -5"
+                ],
+                jawabanBenar: 3, // Indeks 3 -> "x < -5"
+                pembahasan: [
+                    "• <b>Aturan Penting PtLSV:</b> Jika kedua ruas dikali atau dibagi dengan <b>bilangan negatif</b>, maka tanda pertidaksamaan <b>wajib dibalik</b>!",
+                    "• Bagi kedua ruas dengan -4 (tanda '>' berubah menjadi '<'):",
+                    "• x < 20 / (-4)",
+                    "• Diperoleh: <b>x < -5</b>."
+                ]
+            },
+            {
+                id: 7,
+                level: "Level 7 • Negatif & Konstanta",
+                pertanyaan: "Tentukan penyelesaian dari pertidaksamaan <span class='math-expr'>8 - 2x ≤ 14</span>!",
+                pilihan: [
+                    "x ≥ -3",
+                    "x ≤ -3",
+                    "x ≥ 3",
+                    "x ≤ 3"
+                ],
+                jawabanBenar: 0, // Indeks 0 -> "x ≥ -3"
+                pembahasan: [
+                    "• Kurangi kedua ruas dengan 8: <br>-2x ≤ 14 - 8 → -2x ≤ 6",
+                    "• Bagi kedua ruas dengan -2 (karena dibagi bilangan negatif, tanda '≤' dibalik menjadi '≥'):",
+                    "• x ≥ 6 / (-2)",
+                    "• Jadi, hasilnya adalah <b>x ≥ -3</b>."
+                ]
+            },
+            {
+                id: 8,
+                level: "Level 8 • Bentuk Tanda Kurung",
+                pertanyaan: "Penyelesaian dari <span class='math-expr'>2(x - 3) > 4x + 2</span> adalah...",
+                pilihan: [
+                    "x > -4",
+                    "x < -4",
+                    "x < 4",
+                    "x > 2"
+                ],
+                jawabanBenar: 1, // Indeks 1 -> "x < -4"
+                pembahasan: [
+                    "• Jabarkan tanda kurung terlebih dahulu: <br>2x - 6 > 4x + 2",
+                    "• Pindahkan variabel ke kiri dan angka ke kanan: <br>2x - 4x > 2 + 6",
+                    "• -2x > 8",
+                    "• Bagi kedua ruas dengan -2 (balik tanda '>' menjadi '<'): <br>x < 8 / (-2) → <b>x < -4</b>."
+                ]
+            },
+            {
+                id: 9,
+                level: "Level 9 • Bentuk Pecahan",
+                pertanyaan: "Nilai <span class='math-expr'>x</span> yang memenuhi pertidaksamaan <span class='math-expr'>(2x + 1)/3 ≤ 5</span> adalah...",
+                pilihan: [
+                    "x ≤ 4",
+                    "x ≤ 5",
+                    "x ≤ 7",
+                    "x ≥ 7"
+                ],
+                jawabanBenar: 2, // Indeks 2 -> "x ≤ 7"
+                pembahasan: [
+                    "• Kalikan kedua ruas dengan penyebutnya yaitu 3 (bilangan positif, tanda tetap):",
+                    "• 2x + 1 ≤ 5 × 3",
+                    "• 2x + 1 ≤ 15",
+                    "• 2x ≤ 15 - 1 → 2x ≤ 14",
+                    "• Bagi kedua ruas dengan 2: <b>x ≤ 7</b>."
+                ]
+            },
+            {
+                id: 10,
+                level: "Level 10 • Soal Cerita Aplikasi",
+                pertanyaan: "Sebuah persegi panjang memiliki panjang <span class='math-expr'>(2x + 3)</span> cm dan lebar <span class='math-expr'>8</span> cm. Jika kelilingnya <b>tidak lebih dari 54 cm</b>, maka nilai <span class='math-expr'>x</span> yang memenuhi adalah...",
+                pilihan: [
+                    "x ≤ 8",
+                    "x ≥ 8",
+                    "x ≤ 10",
+                    "x < 8"
+                ],
+                jawabanBenar: 0, // Indeks 0 -> "x ≤ 8"
+                pembahasan: [
+                    "• Rumus keliling persegi panjang: K = 2 × (p + l).",
+                    "• Kata <b>\"tidak lebih dari 54\"</b> berarti ≤ 54.",
+                    "• Susun model PtLSV: <br>2 × ((2x + 3) + 8) ≤ 54",
+                    "• Bagi kedua ruas dengan 2: <br>2x + 11 ≤ 27",
+                    "• 2x ≤ 27 - 11 → 2x ≤ 16 → <b>x ≤ 8</b>."
+                ]
+            }
+        ];
+
+        // ==========================================
+        // VARIABEL STATE APLIKASI KUIS
+        // ==========================================
+        let daftarSoalAktif = [];      // Menyimpan urutan soal yang sedang dimainkan
+        let indeksSoalSaatIni = 0;     // Indeks soal aktif (0 sampai 9)
+        let pilihanTerpilih = null;    // Indeks pilihan yang diklik siswa (0, 1, 2, 3)
+        let sudahDicek = false;        // Status apakah soal saat ini sudah dikonfirmasi
+        let skorBenar = 0;             // Jumlah jawaban benar
+        let riwayatJawaban = [];       // Menyimpan detail jawaban siswa untuk halaman rekap
+        let detikBerjalan = 0;         // Penghitung waktu pengerjaan dalam detik
+        let intervalTimer = null;      // Referensi setInterval untuk timer
+
+        // ==========================================
+        // REFERENSI ELEMEN DOM
+        // ==========================================
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const shuffleToggle = document.getElementById('shuffle-toggle');
+        const startBtn = document.getElementById('start-btn');
+
+        const questionCounter = document.getElementById('question-counter');
+        const timerDisplay = document.getElementById('timer-display');
+        const progressBar = document.getElementById('progress-bar');
+        const difficultyBadge = document.getElementById('difficulty-badge');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const explanationText = document.getElementById('explanation-text');
+
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const nextBtnText = document.getElementById('next-btn-text');
+
+        const finalScoreEl = document.getElementById('final-score');
+        const motivationTextEl = document.getElementById('motivation-text');
+        const totalCorrectEl = document.getElementById('total-correct');
+        const totalWrongEl = document.getElementById('total-wrong');
+        const totalTimeEl = document.getElementById('total-time');
+        const reviewListEl = document.getElementById('review-list');
+
+        const restartShuffleBtn = document.getElementById('restart-shuffle-btn');
+        const restartNormalBtn = document.getElementById('restart-normal-btn');
+
+        // ==========================================
+        // FUNGSI BANTU (UTILITAS)
+        // ==========================================
+
+        /**
+         * Mengacak elemen array menggunakan algoritma Fisher-Yates
+         */
+        function acakArray(arrayAsli) {
+            const salinan = [...arrayAsli];
+            for (let i = salinan.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [salinan[i], salinan[j]] = [salinan[j], salinan[i]];
+            }
+            return salinan;
+        }
+
+        /**
+         * Memformat detik menjadi string MM:SS (contoh: 01:25)
+         */
+        function formatWaktu(totalDetik) {
+            const menit = Math.floor(totalDetik / 60).toString().padStart(2, '0');
+            const detik = (totalDetik % 60).toString().padStart(2, '0');
+            return `${menit}:${detik}`;
+        }
+
+        /**
+         * Memulai timer penghitung waktu pengerjaan
+         */
+        function mulaiTimer() {
+            hentikanTimer();
+            detikBerjalan = 0;
+            timerDisplay.textContent = "00:00";
+            intervalTimer = setInterval(() => {
+                detikBerjalan++;
+                timerDisplay.textContent = formatWaktu(detikBerjalan);
+            }, 1000);
+        }
+
+        /**
+         * Menghentikan timer
+         */
+        function hentikanTimer() {
+            if (intervalTimer) {
+                clearInterval(intervalTimer);
+                intervalTimer = null;
+            }
+        }
+
+        // ==========================================
+        // FUNGSI ALUR UTAMA KUIS
+        // ==========================================
+
+        /**
+         * Memulai sesi kuis baru
+         * @param {boolean} apakahDiacak - Menentukan apakah soal diacak atau urut
+         */
+        function mulaiKuis(apakahDiacak) {
+            // Siapkan daftar soal
+            daftarSoalAktif = apakahDiacak ? acakArray(bankSoalPtLSV) : [...bankSoalPtLSV];
+            indeksSoalSaatIni = 0;
+            skorBenar = 0;
+            riwayatJawaban = [];
+
+            // Atur tampilan layar
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('flex');
+
+            mulaiTimer();
+            tampilkanSoal();
+        }
+
+        /**
+         * Menampilkan soal dan pilihan jawaban pada indeks saat ini
+         */
+        function tampilkanSoal() {
+            const soal = daftarSoalAktif[indeksSoalSaatIni];
+            pilihanTerpilih = null;
+            sudahDicek = false;
+
+            // Perbarui indikator nomor soal dan progress bar
+            const nomorUrut = indeksSoalSaatIni + 1;
+            const totalSoal = daftarSoalAktif.length;
+            questionCounter.textContent = `Soal ${nomorUrut} dari ${totalSoal}`;
+            progressBar.style.width = `${(nomorUrut / totalSoal) * 100}%`;
+
+            // Tampilkan level & pertanyaan
+            difficultyBadge.textContent = soal.level;
+            questionText.innerHTML = soal.pertanyaan;
+
+            // Sembunyikan kotak pembahasan & atur ulang tombol bawah
+            feedbackBox.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            checkBtn.classList.remove('hidden');
+            checkBtn.disabled = true;
+            checkBtn.textContent = "Pilih Jawaban Terlebih Dahulu";
+            checkBtn.className = "w-full py-3.5 px-5 bg-slate-200 text-slate-500 font-bold text-base rounded-2xl transition cursor-not-allowed";
+
+            // Render tombol pilihan A, B, C, D
+            optionsContainer.innerHTML = '';
+            const labelHuruf = ['A', 'B', 'C', 'D'];
+
+            soal.pilihan.forEach((teksPilihan, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'option-btn w-full text-left p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-300 hover:bg-indigo-50/40 flex items-center gap-3.5 focus:outline-none';
+                btn.dataset.index = idx;
+
+                btn.innerHTML = `
+                    <span class="option-letter w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-bold text-sm flex items-center justify-center shrink-0 transition-colors">
+                        ${labelHuruf[idx]}
+                    </span>
+                    <span class="math-expr text-base sm:text-lg text-slate-800 font-semibold leading-snug">
+                        ${teksPilihan}
+                    </span>
+                `;
+
+                btn.addEventListener('click', () => pilihJawaban(idx));
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        /**
+         * Menangani interaksi saat siswa memilih salah satu opsi (A/B/C/D)
+         */
+        function pilihJawaban(idx) {
+            if (sudahDicek) return; // Kunci pilihan jika sudah dicek
+
+            pilihanTerpilih = idx;
+
+            // Perbarui gaya visual semua tombol pilihan
+            const semuaTombol = optionsContainer.querySelectorAll('.option-btn');
+            semuaTombol.forEach((btn, i) => {
+                const badgeHuruf = btn.querySelector('.option-letter');
+                if (i === idx) {
+                    btn.classList.remove('border-slate-200', 'bg-white');
+                    btn.classList.add('border-indigo-600', 'bg-indigo-50/70', 'shadow-sm');
+                    badgeHuruf.classList.remove('bg-slate-100', 'text-slate-700');
+                    badgeHuruf.classList.add('bg-indigo-600', 'text-white');
+                } else {
+                    btn.classList.remove('border-indigo-600', 'bg-indigo-50/70', 'shadow-sm');
+                    btn.classList.add('border-slate-200', 'bg-white');
+                    badgeHuruf.classList.remove('bg-indigo-600', 'text-white');
+                    badgeHuruf.classList.add('bg-slate-100', 'text-slate-700');
+                }
+            });
+
+            // Aktifkan tombol Cek Jawaban
+            checkBtn.disabled = false;
+            checkBtn.textContent = "Cek Jawaban";
+            checkBtn.className = "w-full py-3.5 px-5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-base rounded-2xl shadow-md shadow-indigo-200 transition cursor-pointer";
+        }
+
+        /**
+         * Memeriksa kebenaran jawaban siswa dan menampilkan pembahasan instan
+         */
+        function periksaJawaban() {
+            if (pilihanTerpilih === null || sudahDicek) return;
+
+            sudahDicek = true;
+            const soal = daftarSoalAktif[indeksSoalSaatIni];
+            const apakahBenar = (pilihanTerpilih === soal.jawabanBenar);
+
+            if (apakahBenar) {
+                skorBenar++;
+            }
+
+            // Simpan ke riwayat untuk halaman hasil
+            riwayatJawaban.push({
+                soal: soal,
+                jawabanSiswa: pilihanTerpilih,
+                benar: apakahBenar
+            });
+
+            // Beri tanda warna hijau pada jawaban benar dan merah jika pilihan siswa salah
+            const semuaTombol = optionsContainer.querySelectorAll('.option-btn');
+            semuaTombol.forEach((btn, i) => {
+                btn.disabled = true;
+                const badgeHuruf = btn.querySelector('.option-letter');
+
+                // Reset kelas seleksi awal
+                btn.classList.remove('border-indigo-600', 'bg-indigo-50/70', 'border-slate-200', 'bg-white', 'hover:border-indigo-300', 'hover:bg-indigo-50/40');
+                badgeHuruf.classList.remove('bg-indigo-600', 'bg-slate-100', 'text-slate-700');
+
+                if (i === soal.jawabanBenar) {
+                    // Sorot jawaban yang benar dengan warna hijau zamrud
+                    btn.classList.add('border-emerald-500', 'bg-emerald-50');
+                    badgeHuruf.classList.add('bg-emerald-600', 'text-white');
+                } else if (i === pilihanTerpilih && !apakahBenar) {
+                    // Sorot jawaban siswa yang salah dengan warna merah mawar
+                    btn.classList.add('border-rose-500', 'bg-rose-50');
+                    badgeHuruf.classList.add('bg-rose-600', 'text-white');
+                } else {
+                    btn.classList.add('border-slate-200', 'bg-slate-50/60', 'opacity-60');
+                    badgeHuruf.classList.add('bg-slate-200', 'text-slate-500');
+                }
+            });
+
+            // Tampilkan Kotak Umpan Balik & Langkah Pembahasan
+            feedbackBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-rose-50', 'border-rose-200');
+            if (apakahBenar) {
+                feedbackBox.classList.add('bg-emerald-50', 'border-emerald-200');
+                feedbackIcon.textContent = "✅";
+                feedbackTitle.textContent = "Hebat! Jawabanmu Benar";
+                feedbackTitle.className = "font-extrabold text-base text-emerald-800";
+            } else {
+                feedbackBox.classList.add('bg-rose-50', 'border-rose-200');
+                feedbackIcon.textContent = "❌";
+                feedbackTitle.textContent = "Kurang Tepat, Yuk Pelajari Caranya!";
+                feedbackTitle.className = "font-extrabold text-base text-rose-800";
+            }
+
+            // Render langkah-langkah pembahasan
+            explanationText.innerHTML = soal.pembahasan.map(langkah => `<p>${langkah}</p>`).join('');
+
+            // Tukar tombol Cek Jawaban dengan tombol Lanjut / Lihat Hasil
+            checkBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+
+            if (indeksSoalSaatIni === daftarSoalAktif.length - 1) {
+                nextBtnText.textContent = "Lihat Skor Akhir";
+            } else {
+                nextBtnText.textContent = "Soal Berikutnya";
+            }
+
+            // Gulir lembut ke bawah agar pembahasan langsung terlihat di layar HP kecil
+            setTimeout(() => {
+                feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        /**
+         * Berpindah ke soal berikutnya atau membuka halaman hasil akhir
+         */
+        function lanjutSoalBerikutnya() {
+            if (indeksSoalSaatIni < daftarSoalAktif.length - 1) {
+                indeksSoalSaatIni++;
+                tampilkanSoal();
+            } else {
+                tampilkanHasilAkhir();
+            }
+        }
+
+        /**
+         * Menampilkan halaman rekap skor, motivasi, dan review soal
+         */
+        function tampilkanHasilAkhir() {
+            hentikanTimer();
+
+            quizScreen.classList.add('hidden');
+            quizScreen.classList.remove('flex');
+            resultScreen.classList.remove('hidden');
+            resultScreen.classList.add('flex');
+
+            const totalSoal = daftarSoalAktif.length;
+            const nilaiAkhir = Math.round((skorBenar / totalSoal) * 100);
+            const skorSalah = totalSoal - skorBenar;
+
+            // Tampilkan angka statistik
+            finalScoreEl.textContent = nilaiAkhir;
+            totalCorrectEl.textContent = skorBenar;
+            totalWrongEl.textContent = skorSalah;
+            totalTimeEl.textContent = formatWaktu(detikBerjalan);
+
+            // Pesan motivasi sesuai capaian skor siswa
+            if (nilaiAkhir === 100) {
+                motivationTextEl.textContent = "Sempurna! Kamu menguasai konsep PtLSV dengan luar biasa!";
+            } else if (nilaiAkhir >= 80) {
+                motivationTextEl.textContent = "Keren sekali! Pemahamanmu tentang pertidaksamaan sudah sangat baik.";
+            } else if (nilaiAkhir >= 60) {
+                motivationTextEl.textContent = "Bagus! Perhatikan lagi aturan membalik tanda saat dibagi bilangan negatif ya.";
+            } else {
+                motivationTextEl.textContent = "Jangan menyerah! Baca kembali pembahasan soal dan coba ulangi kuisnya.";
+            }
+
+            // Render daftar review ringkas setiap soal
+            const labelHuruf = ['A', 'B', 'C', 'D'];
+            reviewListEl.innerHTML = '';
+
+            riwayatJawaban.forEach((item, index) => {
+                const kartuReview = document.createElement('div');
+                kartuReview.className = `p-3 rounded-xl border text-xs ${
+                    item.benar
+                        ? 'bg-emerald-50/60 border-emerald-200'
+                        : 'bg-rose-50/60 border-rose-200'
+                }`;
+
+                const teksJawabanSiswa = item.soal.pilihan[item.jawabanSiswa];
+                const teksJawabanBenar = item.soal.pilihan[item.soal.jawabanBenar];
+
+                kartuReview.innerHTML = `
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                        <span class="font-bold text-slate-800">Soal ${index + 1} (${item.soal.level.split('•')[1].trim()})</span>
+                        <span class="font-bold px-2 py-0.5 rounded-full text-[11px] shrink-0 ${
+                            item.benar ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                        }">
+                            ${item.benar ? '✓ Benar' : '✕ Salah'}
+                        </span>
+                    </div>
+                    <p class="text-slate-600 line-clamp-1 mb-1">${item.soal.pertanyaan.replace(/<[^>]*>/g, '')}</p>
+                    <div class="text-slate-700 font-medium">
+                        Jawabanmu: <span class="font-bold">${labelHuruf[item.jawabanSiswa]}. ${teksJawabanSiswa}</span>
+                        ${!item.benar ? `<br><span class="text-emerald-700">Kunci: <b>${labelHuruf[item.soal.jawabanBenar]}. ${teksJawabanBenar}</b></span>` : ''}
+                    </div>
+                `;
+
+                reviewListEl.appendChild(kartuReview);
+            });
+        }
+
+        // ==========================================
+        // EVENT LISTENER TOMBOL NAVIGASI
+        // ==========================================
+        startBtn.addEventListener('click', () => {
+            mulaiKuis(shuffleToggle.checked);
+        });
+
+        checkBtn.addEventListener('click', periksaJawaban);
+        nextBtn.addEventListener('click', lanjutSoalBerikutnya);
+
+        restartShuffleBtn.addEventListener('click', () => {
+            mulaiKuis(true);
+        });
+
+        restartNormalBtn.addEventListener('click', () => {
+            mulaiKuis(false);
+        });
+    </script>
+</body>
+</html>
